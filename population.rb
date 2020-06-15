@@ -1,67 +1,75 @@
 class Population
   attr_accessor :members
-  # @goal is string that AI go to find
-  def initialize(goal, size)
+
+  def initialize(objective, size, mutation_chance = 0.5)
+    @mutation_chance = mutation_chance.to_f || 0.5
     @members = []
-    @goal = goal
+    @objective = objective
     @generation_number = 0
     @min_cost = 9999
 
     (0..size).each do
-      gene = Gene.new().randomize(@goal)
+      gene = Gene.new().randomized(@objective)
       @members << gene
     end
   end
 
   def display
-
-    result = ""
-    # (0..@members.length - 1).each_with_index do |_, i|
-    #   result += "\r#{@members[i].code} " " + #{@members[i].cost.to_s}"
-    # end
-    # binding.pry
-    STDOUT.write "\r#{@members.first.code} #{@members.first.cost} GOAL = #{@goal}  MIN COST #{@min_cost} GEN #{@generation_number}   \r"
-
+    puts"\r#{@members.first.code}\
+     #{@members.first.cost} OBJECTIVE = #{@objective}\
+     MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---\r"
+     STDOUT.write "\r"
   end
 
   def generation
-    @members.each do |member|
-      member.calc_cost(@goal)
+    calc_cost_and_sort_members
+    set_min_cost
+    display
+    crossover
+
+    try_mutate
+    return true if members[0].cost == 0
+    @generation_number += 1
+    # sleep 0.001
+  end
+
+  private
+
+  def try_mutate
+    @members.each_with_index do |_, i|
+      @members[i].mutate(@mutation_chance)
+      @members[i].calc_cost(@objective)
+
+      next if @members[i].code != @objective
+      display
+      puts @members[i].code
+      puts @members[i].cost
+      puts @generation_number
+
+      return true
     end
+    return false
+  end
 
-    @members = @members.sort_by &:cost
-
-    if @members[0].cost < @min_cost
-      @min_cost = @members[0].cost
-    end
-
-    self.display()
-
+  def crossover
     childrens = @members[0].mate(@members[1])
     childrens2 = @members[2].mate(@members[3])
 
-    # childrens[0].calc_cost(@goal)
-    # childrens[1].calc_cost(@goal)
-    # childrens2[0].calc_cost(@goal)
-    # childrens2[1].calc_cost(@goal)
-
     @members[-2..-1] = [childrens[0], childrens[1]]
     @members[-4..-3] = [childrens2[0], childrens2[1]]
+  end
 
-    @members.each_with_index do |_, i|
-      @members[i].mutate(0.5)
-      @members[i].calc_cost(@goal)
-
-      if (@members[i].code == @goal)
-          self.display()
-          puts @members[i].code
-          puts @members[i].cost
-
-          return true
-      end
+  def calc_cost_and_sort_members
+    @members.each do |member|
+      member.calc_cost(@objective)
     end
-    @generation_number += 1
-    sleep 0.01
+
+    @members = @members.sort_by &:cost
+  end
+
+  def set_min_cost
+    return unless @members[0].cost < @min_cost
+
+    @min_cost = @members[0].cost
   end
 end
-
