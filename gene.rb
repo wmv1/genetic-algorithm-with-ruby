@@ -40,7 +40,6 @@ class Gene
   end
 
   def mate(gene)
-
    if @code.length.to_f % 2 == 0
     pivot = ((@code.length.to_f / 2)).round()
      else

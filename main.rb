@@ -1,8 +1,14 @@
 require './gene.rb'
 require './population.rb'
 require 'pry'
+require "timeout"
+
+
 
 class Main
+
+
+
   puts "Digite o objetivo:"
   objective = gets.chomp
 
@@ -16,7 +22,27 @@ class Main
 
   population = Population.new(objective, gene_limit, mutate_chance)
   print objective
-  loop do
-    break if population.generation == true
+
+
+  t = Thread.new do
+while population.objective != "exit"
+  break if population.min_cost == 0
+    begin
+      Timeout::timeout 0.1 do
+        STDOUT.print "Altere  "
+        population.objective = gets.chomp
+      end
+    rescue => exception
+
+    end
   end
+end
+
+  t2 = Thread.new do
+    loop do
+      break if population.generation == true
+    end
+  end
+  t.join
+  t2.join
 end

@@ -1,23 +1,28 @@
 class Population
-  attr_accessor :members
+  attr_accessor :members, :objective, :min_cost
 
   def initialize(objective, size, mutation_chance = 0.5)
+    @size = size
     @mutation_chance = mutation_chance.to_f || 0.5
     @members = []
     @objective = objective
     @generation_number = 0
     @min_cost = 9999
 
-    (0..size).each do
+    generate_genes
+  end
+
+  def generate_genes
+    (0..@size).each do
       gene = Gene.new().randomized(@objective)
       @members << gene
     end
   end
 
   def display
-    puts"\r#{@members.first.code}\
+    puts"#{@members.first.code}\
      #{@members.first.cost} OBJECTIVE = #{@objective}\
-     MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---\r"
+     MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---"
      STDOUT.write "\r"
   end
 
@@ -28,9 +33,9 @@ class Population
     crossover
 
     try_mutate
-    return true if members[0].cost == 0
+    return true if members[0].cost == 0 || @objective == 'exit'
     @generation_number += 1
-    # sleep 0.001
+    sleep 0.1
   end
 
   private
@@ -60,6 +65,11 @@ class Population
   end
 
   def calc_cost_and_sort_members
+    if @members[0].code.length != @objective.length
+      @members = []
+      generate_genes
+    end
+
     @members.each do |member|
       member.calc_cost(@objective)
     end
