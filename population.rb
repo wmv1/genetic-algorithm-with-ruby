@@ -1,5 +1,5 @@
 class Population
-  attr_accessor :members, :objective, :min_cost
+  attr_accessor :members, :objective, :min_cost, :generation_number
 
   def initialize(objective, size, mutation_chance = 0.5)
     @size = size
@@ -9,19 +9,19 @@ class Population
     @generation_number = 0
     @min_cost = 9999
 
-    generate_genes
+    generate_chromosome
   end
 
-  def generate_genes
+  def generate_chromosome
     (0..@size).each do
-      gene = Gene.new().randomized(@objective)
-      @members << gene
+      chromosome = Chromosome.new().randomized(@objective)
+      @members << chromosome
     end
   end
 
   def display
     puts"#{@members.first.code}\
-     #{@members.first.cost} OBJECTIVE = #{@objective}\
+      OBJECTIVE = #{@objective}\
      MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---"
      STDOUT.write "\r"
   end
@@ -35,7 +35,7 @@ class Population
     try_mutate
     return true if members[0].cost == 0 || @objective == 'exit'
     @generation_number += 1
-    sleep 0.1
+    sleep 0.01
   end
 
   private
@@ -47,9 +47,7 @@ class Population
 
       next if @members[i].code != @objective
       display
-      puts @members[i].code
-      puts @members[i].cost
-      puts @generation_number
+
 
       return true
     end
@@ -60,14 +58,23 @@ class Population
     childrens = @members[0].mate(@members[1])
     childrens2 = @members[2].mate(@members[3])
 
+     # In this block, there is an ordering of the best and the exclusion of the worst members, copying the best result to the others
+    #  @members = @members.sort_by &:cost
+    #  for i in 1..@members.length - 1
+    #   if @members.first.cost < @members[i].cost
+    #    @members[i] = @members.first
+    #   end
+    #  end
     @members[-2..-1] = [childrens[0], childrens[1]]
     @members[-4..-3] = [childrens2[0], childrens2[1]]
+
+
   end
 
   def calc_cost_and_sort_members
     if @members[0].code.length != @objective.length
       @members = []
-      generate_genes
+      generate_chromosome
     end
 
     @members.each do |member|

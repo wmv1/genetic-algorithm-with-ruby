@@ -1,4 +1,4 @@
-class Gene
+class Chromosome
   attr_accessor :code, :cost
 
   def initialize(code = '')
@@ -8,7 +8,7 @@ class Gene
 
   def randomized(goal_length)
     @code = random_string(goal_length.length)
-    return Gene.new(@code)
+    return Chromosome.new(@code)
   end
 
   def random_string(length = 10, complexity = 4)
@@ -58,7 +58,7 @@ class Gene
       child2 += @code[i]
     end
 
-    [Gene.new(child1), Gene.new(child2)]
+    [Chromosome.new(child1), Chromosome.new(child2)]
   end
 
   def calc_cost(compare_to)
