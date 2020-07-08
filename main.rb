@@ -3,10 +3,7 @@ require './population.rb'
 require 'pry'
 require "timeout"
 
-
-
 class Main
-
   puts "Digite o objetivo:"
   objective = gets.chomp
 
@@ -21,34 +18,25 @@ class Main
   population = Population.new(objective, chromosome_limit, mutate_chance)
   print objective
 
-  # Thread that possibilite change the objective by terminal inputs
   t = Thread.new do
-while population.objective != "exit"
-  break if population.min_cost == 0 || population.objective == objective
-    begin
-      Timeout::timeout 0.1 do
-        STDOUT.print "Altere  "
-        population.objective = gets.chomp
-      end
-    rescue => exception
+    while population.generation != true
+      break if population.min_cost == 0
+      begin
+        Timeout::timeout 0.001 do
+          STDOUT.print " "
+          population.objective = gets.chomp
+        end
+      rescue => exception
 
-    end
-  end
-end
-
-  t2 = Thread.new do
-    loop do
-      if population.generation == true
-        puts ""
-        puts ""
-        puts ""
-        puts "Objetivo:  #{objective}"
-        puts "Resultado: #{population.members.first.code}"
-        puts "Números de gerações: #{population.generation_number}"
-        break
       end
     end
+
+    puts ""
+    puts "Objetivo:  #{population.objective}"
+    puts "Resultado: #{population.members.first.code}"
+    puts "Números de gerações: #{population.generation_number}"
   end
+
   t.join
-  t2.join
+
 end

@@ -36,6 +36,7 @@ class Population
     return true if members[0].cost == 0 || @objective == 'exit'
     @generation_number += 1
     sleep 0.01
+    return false
   end
 
   private
