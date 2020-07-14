@@ -13,7 +13,7 @@ class Population
   end
 
   def generate_chromosome
-    (0..@size).each do
+    @size.times do
       chromosome = Chromosome.new().randomized(@objective)
       @members << chromosome
     end
@@ -22,8 +22,8 @@ class Population
   def display
     puts"#{@members.first.code}\
       OBJECTIVE = #{@objective}\
-     MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---"
-     STDOUT.write "\r"
+      MIN COST #{@min_cost} GENERATIONS #{@generation_number} ---"
+      STDOUT.write "\r"
   end
 
   def generation
@@ -31,11 +31,14 @@ class Population
     set_min_cost
     display
     crossover
-
     try_mutate
+
     return true if members[0].cost == 0 || @objective == 'exit'
+
     @generation_number += 1
+
     sleep 0.01
+
     return false
   end
 
