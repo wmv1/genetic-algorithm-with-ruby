@@ -13,7 +13,7 @@ class Population
   end
 
   def generate_chromosome
-    @size.times do
+    (0..@size).each do
       chromosome = Chromosome.new().randomized(@objective)
       @members << chromosome
     end
